@@ -1,7 +1,8 @@
-import praw
 import json
-import datetime
 import time
+from datetime import datetime
+
+from praw import Reddit
 
 if time.strftime("%d/%m/%Y") == open("/Users/jblanco/reddit-bot/last_run",'r').read():
     exit()
@@ -13,11 +14,11 @@ else:
 json_str = open("/Users/jblanco/reddit-bot/params.json",'r').read()
 params = json.loads(json_str)
 
-reddit = praw.Reddit(client_id='YRLrk60hAOy0IA',
-                     client_secret= params['client_secret'],
-                     user_agent= 'uruguay-bot-user-agent',
-                     username= params['username'],
-                     password= params['password'])
+reddit = Reddit(client_id='YRLrk60hAOy0IA',
+                client_secret=params['client_secret'],
+                user_agent='uruguay-bot-user-agent',
+                username=params['username'],
+                password=params['password'])
 
 today_index = datetime.datetime.today().weekday()
 
