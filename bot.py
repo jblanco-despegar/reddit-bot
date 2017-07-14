@@ -4,21 +4,26 @@ from datetime import datetime
 
 from praw import Reddit
 
+
+try:
+    with open('config.json', 'r') as config_data:
+        config = json.load(config_data)
+except FileNotFoundError:
+    print('Could not find config.json file')
+
+reddit = Reddit(username=config.get('username'),
+                password=config.get('password'),
+                client_id=config.get('client_id'),
+                client_secret=config.get('client_secret'),
+                user_agent=config.get('user-agent', 'uruguay-bot-user-agent'))
+
+
 if time.strftime("%d/%m/%Y") == open("/Users/jblanco/reddit-bot/last_run",'r').read():
     exit()
 else:
     f = open("/Users/jblanco/reddit-bot/last_run",'w')
     f.write(time.strftime("%d/%m/%Y"))
 
-
-json_str = open("/Users/jblanco/reddit-bot/params.json",'r').read()
-params = json.loads(json_str)
-
-reddit = Reddit(client_id='YRLrk60hAOy0IA',
-                client_secret=params['client_secret'],
-                user_agent='uruguay-bot-user-agent',
-                username=params['username'],
-                password=params['password'])
 
 today_index = datetime.datetime.today().weekday()
 
