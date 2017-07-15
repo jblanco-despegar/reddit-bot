@@ -23,7 +23,7 @@ reddit = Reddit(username=config.get('username'),
 subreddit = reddit.subreddit('Uruguay_beta')
 
 
-def schedulePost(title, body, sticky=False):
+def schedulePost(title, body=None, sticky=False):
     post = subreddit.submit(title, selftext=body)
     if sticky:
         post.mod.sticky()
@@ -42,6 +42,17 @@ def auto_unsticky():
 
 scheduler.every().day.at('00:00').do(auto_unsticky)
 
+scheduler.every().friday.at('09:00').do(
+    schedulePost(title='UPT: Uruguay Pro Tips')
+    )
+
+scheduler.every().saturday.at('09:00').do(
+    schedulePost(title='Sabado de deportes')
+    )
+
+scheduler.every().sunday.at('09:00').do(
+    schedulePost(title='Domingo de noticias y politica')
+    )
 
 while True:
     scheduler.run_pending()
