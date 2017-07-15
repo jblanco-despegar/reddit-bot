@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+
 import json
-import time
 from datetime import datetime
+from time import sleep
 
 from praw import Reddit
 
+import scheduler
 
 try:
     with open('config.json', 'r') as config_data:
@@ -18,22 +20,29 @@ reddit = Reddit(username=config.get('username'),
                 client_secret=config.get('client_secret'),
                 user_agent=config.get('user-agent', 'uruguay-bot-user-agent'))
 
-
-if time.strftime("%d/%m/%Y") == open("/Users/jblanco/reddit-bot/last_run",'r').read():
-    exit()
-else:
-    f = open("/Users/jblanco/reddit-bot/last_run",'w')
-    f.write(time.strftime("%d/%m/%Y"))
+subreddit = reddit.subreddit('Uruguay_beta')
 
 
-today_index = datetime.datetime.today().weekday()
+def schedulePost(title, body, sticky=False):
+    post = subreddit.submit(title, selftext=body)
+    if sticky:
+        post.mod.sticky()
 
-subr = reddit.subreddit('Uruguay_beta')
-if today_index == 0:
-    #tengo que agregar el sticky de hoy
-    subr.submit('Lunes de RANT2', selftext='Some text').mod.sticky()
-else:
-    #si hay un sticky del lunes, hay que removerlo
-    for s in subr.submissions():
-        if s.title == "Lunes de RANT2":
-            s.mod.sticky(False)
+
+def auto_unsticky():
+    username = reddit.user.me().name
+    for post in subreddit.search(query='author:{}'.format(username),
+                                 time_filter='week'):
+        created_date = datetime.fromtimestamp(post.created)
+        midnight = datetime.now().replace(hour=0, minute=0, second=0,
+                                          microsecond=0)
+        if created_date <= midnight:
+            post.mod.sticky(False)
+
+
+scheduler.every().day.at('00:00').do(auto_unsticky)
+
+
+while True:
+    scheduler.run_pending()
+    sleep(60)
