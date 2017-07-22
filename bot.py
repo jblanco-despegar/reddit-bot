@@ -43,16 +43,13 @@ def auto_unsticky():
 scheduler.every().day.at('00:00').do(auto_unsticky)
 
 scheduler.every().friday.at('09:00').do(
-    schedulePost(title='UPT: Uruguay Pro Tips')
-    )
+    schedulePost, title='UPT: Uruguay Pro Tips')
 
 scheduler.every().saturday.at('09:00').do(
-    schedulePost(title='Sabado de deportes')
-    )
+    schedulePost, title='Sabado de deportes')
 
 scheduler.every().sunday.at('09:00').do(
-    schedulePost(title='Domingo de noticias y politica')
-    )
+    schedulePost, title='Domingo de noticias y politica')
 
 while True:
     scheduler.run_pending()
